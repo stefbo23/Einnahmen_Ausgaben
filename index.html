@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mentallions · EÜR</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f4ef;
+    --surface: #ffffff;
+    --surface2: #f0ece4;
+    --ink: #1a1714;
+    --ink2: #6b6560;
+    --accent: #c17d3c;
+    --accent2: #e8a96a;
+    --green: #3a7d5c;
+    --red: #b84a3a;
+    --border: #ddd8cf;
+    --radius: 12px;
+    --shadow: 0 2px 16px rgba(0,0,0,0.07);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; font-size: 15px; }
+
+  header { background: var(--ink); color: #fff; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  header h1 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; }
+  header span { font-size: 12px; color: var(--accent2); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  .year-bar { background: var(--ink); padding: 0 24px 16px; display: flex; gap: 8px; }
+  .year-btn { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+  .year-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .tabs { display: flex; border-bottom: 2px solid var(--border); background: var(--surface); }
+  .tab { flex: 1; padding: 14px 10px; text-align: center; font-size: 13px; font-weight: 500; cursor: pointer; color: var(--ink2); border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; letter-spacing: 0.04em; text-transform: uppercase; }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-icon { font-size: 16px; display: block; margin-bottom: 2px; }
+
+  main { max-width: 900px; margin: 0 auto; padding: 24px 16px 80px; }
+
+  .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
+  @media (max-width: 600px) { .dashboard { grid-template-columns: 1fr 1fr; } .dashboard .card:last-child { grid-column: span 2; } }
+  .card { background: var(--surface); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+  .card-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink2); margin-bottom: 8px; font-weight: 500; }
+  .card-value { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; }
+  .card-value.green { color: var(--green); }
+  .card-value.red { color: var(--red); }
+  .card-value.accent { color: var(--accent); }
+  .card-sub { font-size: 12px; color: var(--ink2); margin-top: 4px; }
+
+  .section { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 20px; overflow: hidden; }
+  .section-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); background: var(--surface2); }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; }
+  .dot.green { background: var(--green); }
+  .dot.red { background: var(--red); }
+  .dot.accent { background: var(--accent); }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 16px 20px; }
+  @media (max-width: 500px) { .form-grid { grid-template-columns: 1fr; } }
+  .form-grid .full { grid-column: span 2; }
+  @media (max-width: 500px) { .form-grid .full { grid-column: span 1; } }
+
+  label { display: block; font-size: 12px; font-weight: 500; color: var(--ink2); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.06em; }
+  input, select { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; background: var(--bg); color: var(--ink); outline: none; transition: border-color 0.2s; }
+  input:focus, select:focus { border-color: var(--accent); }
+
+  .btn { padding: 11px 22px; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+  .btn-green { background: var(--green); color: #fff; }
+  .btn-green:hover { background: #2e6349; }
+  .btn-red { background: var(--red); color: #fff; }
+  .btn-red:hover { background: #9a3d2f; }
+  .btn-accent { background: var(--accent); color: #fff; }
+  .btn-accent:hover { background: #a56830; }
+  .btn-ghost { background: transparent; color: var(--ink2); border: 1.5px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { padding: 10px 14px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink2); border-bottom: 1.5px solid var(--border); font-weight: 500; white-space: nowrap; }
+  td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg); }
+  .amount-green { color: var(--green); font-weight: 600; font-family: 'Playfair Display', serif; }
+  .amount-red { color: var(--red); font-weight: 600; font-family: 'Playfair Display', serif; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+  .badge-green { background: #e8f4ee; color: var(--green); }
+  .badge-red { background: #faeae8; color: var(--red); }
+  .del-btn { background: none; border: none; cursor: pointer; color: var(--ink2); font-size: 16px; padding: 2px 6px; border-radius: 4px; transition: all 0.15s; }
+  .del-btn:hover { background: #faeae8; color: var(--red); }
+
+  .empty { text-align: center; padding: 36px 20px; color: var(--ink2); font-size: 14px; }
+  .empty-icon { font-size: 32px; margin-bottom: 8px; }
+
+  .export-bar { display: flex; gap: 10px; padding: 14px 20px; border-top: 1px solid var(--border); background: var(--surface2); flex-wrap: wrap; }
+
+  .filter-bar { display: flex; gap: 6px; padding: 12px 20px; border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: none; }
+  .filter-bar::-webkit-scrollbar { display: none; }
+  .month-btn { background: transparent; border: 1.5px solid var(--border); color: var(--ink2); padding: 5px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: 'DM Sans', sans-serif; font-weight: 500; }
+  .month-btn.active { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+  /* SCAN */
+  .scan-drop { border: 2.5px dashed var(--border); border-radius: var(--radius); padding: 36px 20px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--bg); margin: 16px 20px; position: relative; }
+  .scan-drop:hover { border-color: var(--accent); background: #fdf6ee; }
+  .scan-drop input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .scan-icon { font-size: 44px; margin-bottom: 10px; }
+  .scan-drop-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .scan-drop-sub { font-size: 13px; color: var(--ink2); }
+
+  .scan-preview { margin: 0 20px 16px; display: none; }
+  .scan-preview img { width: 100%; max-height: 220px; object-fit: contain; border-radius: 8px; border: 1px solid var(--border); }
+
+  .scan-loading { display: none; text-align: center; padding: 28px; }
+  .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 12px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .scan-loading-text { font-size: 14px; color: var(--ink2); }
+
+  .scan-result { display: none; margin: 0 20px 16px; background: var(--surface2); border-radius: var(--radius); padding: 16px; border: 1.5px solid var(--accent2); }
+  .scan-result-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); font-weight: 600; margin-bottom: 12px; }
+  .scan-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 500px) { .scan-fields { grid-template-columns: 1fr; } }
+  .scan-fields .full { grid-column: span 2; }
+  @media (max-width: 500px) { .scan-fields .full { grid-column: span 1; } }
+  .scan-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .receipt-thumb { width: 32px; height: 32px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); cursor: pointer; transition: transform 0.15s; }
+  .receipt-thumb:hover { transform: scale(1.1); }
+
+  .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 8px; }
+  .lightbox-close { position: absolute; top: 20px; right: 24px; color: #fff; font-size: 28px; cursor: pointer; background: none; border: none; }
+
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--ink); color: #fff; padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: 500; transition: transform 0.3s ease; z-index: 999; white-space: nowrap; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .auth-screen { max-width: 440px; margin: 40px auto; padding: 0 16px; }
+  .auth-card { background: var(--surface); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+  .auth-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+  .auth-sub { color: var(--ink2); font-size: 14px; margin-bottom: 18px; line-height: 1.4; }
+  .auth-actions { display: flex; justify-content: flex-end; margin-top: 14px; }
+  .user-bar { display: flex; align-items: center; gap: 10px; }
+  .user-email { color: var(--accent2); font-size: 12px; max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .header-logout { background: transparent; border: 1px solid rgba(255,255,255,0.25); color: #fff; border-radius: 20px; padding: 6px 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 12px; }
+  .header-logout:hover { border-color: var(--accent2); color: var(--accent2); }
+
+</style>
+</head>
+<body>
+
+<header>
+  <h1>mentallions · EÜR</h1>
+  <div class="user-bar" id="userBar" style="display:none;">
+    <span id="currentUserEmail" class="user-email"></span>
+    <span id="headerYear">2026</span>
+    <button class="header-logout" onclick="logout()">Logout</button>
+  </div>
+</header>
+
+<div class="auth-screen" id="authScreen">
+  <div class="auth-card">
+    <div class="auth-title">Login</div>
+    <div class="auth-sub">Melde dich mit deinem Supabase-User an. Es gibt keine öffentliche Registrierung.</div>
+    <div class="field">
+      <label>E-Mail</label>
+      <input type="email" id="loginEmail" placeholder="deine@email.at">
+    </div>
+    <div class="field">
+      <label>Passwort</label>
+      <input type="password" id="loginPassword" placeholder="Passwort" onkeydown="if(event.key==='Enter'){login();}">
+    </div>
+    <div class="auth-actions">
+      <button class="btn btn-accent" onclick="login()">Einloggen</button>
+    </div>
+  </div>
+</div>
+
+<div id="appShell" style="display:none;">
+<div class="year-bar" id="yearBar"></div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('dashboard')"><span class="tab-icon">📊</span>Übersicht</div>
+  <div class="tab" onclick="switchTab('scan')"><span class="tab-icon">📷</span>Beleg scannen</div>
+  <div class="tab" onclick="switchTab('manual')"><span class="tab-icon">✏️</span>Manuell</div>
+  <div class="tab" onclick="switchTab('list')"><span class="tab-icon">📋</span>Buchungen</div>
+</div>
+
+<main>
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="dashboard">
+      <div class="card"><div class="card-label">Einnahmen</div><div class="card-value green" id="totalIncome">€ 0,00</div><div class="card-sub" id="incomeCount">0 Buchungen</div></div>
+      <div class="card"><div class="card-label">Ausgaben</div><div class="card-value red" id="totalExpense">€ 0,00</div><div class="card-sub" id="expenseCount">0 Buchungen</div></div>
+      <div class="card"><div class="card-label">Überschuss</div><div class="card-value accent" id="totalProfit">€ 0,00</div><div class="card-sub" id="profitNote">EÜR Ergebnis</div></div>
+    </div>
+    <div class="section">
+      <div class="section-header"><div class="section-title">Monatsübersicht</div></div>
+      <div id="monthlyBreakdown" style="padding:16px 20px;"></div>
+    </div>
+  </div>
+
+  <!-- SCAN -->
+  <div class="page" id="page-scan">
+    <div class="section">
+      <div class="section-header"><div class="section-title"><span class="dot accent"></span>Beleg scannen</div></div>
+      <div class="scan-drop" id="scanDrop">
+        <input type="file" id="scanInput" accept="image/*" capture="environment" onchange="handleScanFile(event)">
+        <div class="scan-icon">📷</div>
+        <div class="scan-drop-title">Foto hochladen oder fotografieren</div>
+        <div class="scan-drop-sub">Rechnung, Kassenbon, Quittung — KI liest Datum, Betrag & Kategorie automatisch aus</div>
+      </div>
+      <div class="scan-preview" id="scanPreview"><img id="scanPreviewImg" src="" alt="Beleg"></div>
+      <div class="scan-loading" id="scanLoading">
+        <div class="spinner"></div>
+        <div class="scan-loading-text">KI liest Beleg aus …</div>
+      </div>
+      <div class="scan-result" id="scanResult">
+        <div class="scan-result-title">✓ Beleg erkannt — bitte prüfen &amp; bestätigen</div>
+        <div class="scan-fields">
+          <div><label>Typ</label><select id="srType" onchange="updateSrCats()"><option value="expense">Ausgabe</option><option value="income">Einnahme</option></select></div>
+          <div><label>Datum</label><input type="date" id="srDate"></div>
+          <div><label>Betrag (€)</label><input type="number" id="srAmount" step="0.01" min="0"></div>
+          <div><label>Kategorie</label><select id="srCat"></select></div>
+          <div class="full"><label>Beschreibung</label><input type="text" id="srDesc"></div>
+        </div>
+        <div class="scan-actions">
+          <button class="btn btn-green" onclick="confirmScan()">✓ Bestätigen &amp; speichern</button>
+          <button class="btn btn-ghost" onclick="resetScan()">Abbrechen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MANUAL -->
+  <div class="page" id="page-manual">
+    <div class="section">
+      <div class="section-header"><div class="section-title"><span class="dot green"></span>Einnahme eintragen</div></div>
+      <div class="form-grid">
+        <div><label>Datum</label><input type="date" id="incDate"></div>
+        <div><label>Betrag (€)</label><input type="number" id="incAmount" placeholder="0,00" step="0.01" min="0"></div>
+        <div><label>Kategorie</label><select id="incCat"><option>Nachhilfe</option><option>Lerncoaching</option><option>Mental Training</option><option>Online-Kurs</option><option>Sonstiges</option></select></div>
+        <div><label>Beschreibung</label><input type="text" id="incDesc" placeholder="z.B. Schüler Max, Mathe"></div>
+        <div class="full" style="display:flex;justify-content:flex-end;"><button class="btn btn-green" onclick="addEntry('income')">+ Einnahme speichern</button></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-header"><div class="section-title"><span class="dot red"></span>Ausgabe eintragen</div></div>
+      <div class="form-grid">
+        <div><label>Datum</label><input type="date" id="expDate"></div>
+        <div><label>Betrag (€)</label><input type="number" id="expAmount" placeholder="0,00" step="0.01" min="0"></div>
+        <div><label>Kategorie</label><select id="expCat"><option>Arbeitsmittel</option><option>Fachliteratur / Bücher</option><option>Fortbildung / Kurs</option><option>Software / Abos</option><option>Fahrtkosten</option><option>Bürobedarf</option><option>Telefon / Internet</option><option>Werbung / Marketing</option><option>Sonstiges</option></select></div>
+        <div><label>Beschreibung</label><input type="text" id="expDesc" placeholder="z.B. Canva Pro Jahresabo"></div>
+        <div class="full" style="display:flex;justify-content:flex-end;"><button class="btn btn-red" onclick="addEntry('expense')">+ Ausgabe speichern</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIST -->
+  <div class="page" id="page-list">
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Alle Buchungen</div>
+        <button class="btn btn-ghost" style="font-size:13px;padding:7px 14px;" onclick="clearFilter()">Alle anzeigen</button>
+      </div>
+      <div class="filter-bar" id="monthFilter"></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Datum</th><th>Typ</th><th>Kategorie</th><th>Beschreibung</th><th>Betrag</th><th>Beleg</th><th></th></tr></thead>
+          <tbody id="entriesTable"></tbody>
+        </table>
+        <div id="emptyState" class="empty" style="display:none;"><div class="empty-icon">📋</div>Noch keine Buchungen für diesen Zeitraum.</div>
+      </div>
+      <div class="export-bar">
+        <button class="btn btn-accent" onclick="exportCSV()">⬇ CSV Export</button>
+        <button class="btn btn-ghost" onclick="exportCSV('steuer')">📄 Steuerberater-Export</button>
+        <label class="btn btn-ghost" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+          ⬆ CSV Import
+          <input type="file" accept=".csv" style="display:none;" onchange="importCSV(event)">
+        </label>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightboxImg" src="" alt="Beleg">
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://ecwtnrqturnqbdxmvnau.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_5x5Zse548W2ExLiWsHGi7w_NGsHU_m6';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const START_YEAR = 2024;
+let YEARS = [];
+const INC_CATS = ['Nachhilfe','Lerncoaching','Mental Training','Online-Kurs','Sonstiges'];
+const EXP_CATS = ['Arbeitsmittel','Fachliteratur / Bücher','Fortbildung / Kurs','Software / Abos','Fahrtkosten','Bürobedarf','Telefon / Internet','Werbung / Marketing','Sonstiges'];
+const MONTHS = ['Jän','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+
+let currentUser = null;
+let entries = [];
+let currentYear = new Date().getFullYear();
+let activeMonth = null;
+let currentScanImage = null;
+
+function buildYears() {
+  const now = new Date().getFullYear();
+  const fromEntries = entries.map(e => parseInt(String(e.date).split('-')[0], 10)).filter(Boolean);
+  const minYear = Math.min(START_YEAR, now, ...fromEntries);
+  const maxYear = Math.max(now + 3, ...fromEntries);
+  YEARS = [];
+  for (let y = minYear; y <= maxYear; y++) YEARS.push(y);
+  if (!YEARS.includes(currentYear)) currentYear = now;
+}
+function visibleEntries() { return entries.filter(e => String(e.date).startsWith(currentYear + '-')); }
+function today() { return new Date().toISOString().split('T')[0]; }
+function formatEur(n) { return n.toLocaleString('de-AT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+async function login() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if (!email || !password) { showToast('Bitte E-Mail und Passwort eingeben ⚠️'); return; }
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  if (error) { showToast('Login fehlgeschlagen: ' + error.message); return; }
+
+  currentUser = data.user;
+  await afterLogin();
+}
+
+async function logout() {
+  await supabaseClient.auth.signOut();
+  currentUser = null;
+  entries = [];
+  document.getElementById('authScreen').style.display = '';
+  document.getElementById('appShell').style.display = 'none';
+  document.getElementById('userBar').style.display = 'none';
+}
+
+async function initAuth() {
+  const { data } = await supabaseClient.auth.getSession();
+  if (data.session?.user) {
+    currentUser = data.session.user;
+    await afterLogin();
+  } else {
+    document.getElementById('authScreen').style.display = '';
+    document.getElementById('appShell').style.display = 'none';
+    document.getElementById('userBar').style.display = 'none';
+  }
+}
+
+async function afterLogin() {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('appShell').style.display = '';
+  document.getElementById('userBar').style.display = '';
+  document.getElementById('currentUserEmail').textContent = currentUser.email || '';
+  await loadEntries();
+  renderAll();
+}
+
+async function loadEntries() {
+  if (!currentUser) return;
+  const { data, error } = await supabaseClient
+    .from('euer_entries')
+    .select('id,type,date,amount,cat,description,receipt')
+    .order('date', { ascending: false })
+    .order('created_at', { ascending: false });
+  if (error) { showToast('Laden fehlgeschlagen: ' + error.message); return; }
+  entries = (data || []).map(e => ({
+    id: e.id, type: e.type, date: e.date, amount: Number(e.amount), cat: e.cat, desc: e.description, receipt: e.receipt
+  }));
+  buildYears();
+}
+
+async function saveEntry(entry) {
+  if (!currentUser) { showToast('Bitte zuerst einloggen ⚠️'); return false; }
+  const { error } = await supabaseClient.from('euer_entries').insert({
+    user_id: currentUser.id,
+    type: entry.type,
+    date: entry.date,
+    amount: entry.amount,
+    cat: entry.cat,
+    description: entry.desc,
+    receipt: entry.receipt || null
+  });
+  if (error) { showToast('Speichern fehlgeschlagen: ' + error.message); return false; }
+  await loadEntries();
+  return true;
+}
+
+// TABS
+function switchTab(name) {
+  const names = ['dashboard','scan','manual','list'];
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i] === name));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  renderAll();
+}
+
+// YEAR BAR
+function renderYearBar() {
+  const bar = document.getElementById('yearBar');
+  bar.innerHTML = '';
+  YEARS.forEach(y => {
+    const btn = document.createElement('button');
+    btn.className = 'year-btn' + (y === currentYear ? ' active' : '');
+    btn.textContent = y;
+    btn.onclick = () => { currentYear = y; activeMonth = null; renderAll(); };
+    bar.appendChild(btn);
+  });
+  document.getElementById('headerYear').textContent = currentYear;
+}
+
+// SCAN
+function handleScanFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (ev) => {
+    currentScanImage = ev.target.result;
+    document.getElementById('scanPreviewImg').src = currentScanImage;
+    document.getElementById('scanPreview').style.display = '';
+    document.getElementById('scanResult').style.display = 'none';
+    document.getElementById('scanLoading').style.display = '';
+    try {
+      const result = await callClaudeVision(currentScanImage.split(',')[1], file.type || 'image/jpeg');
+      fillScanResult(result);
+    } catch(err) {
+      showToast('KI konnte Beleg nicht lesen — bitte manuell ausfüllen');
+      fillScanResult({ type: 'expense', date: today(), amount: '', cat: 'Sonstiges', desc: '' });
+    }
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+}
+
+async function callClaudeVision(base64, mimeType) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: mimeType, data: base64 } },
+          { type: 'text', text: 'Du bist ein österreichischer Buchhalter-Assistent. Analysiere diesen Beleg und antworte NUR mit einem JSON-Objekt ohne Markdown-Formatierung:\n{"type":"expense oder income","date":"YYYY-MM-DD","amount":12.50,"cat":"Kategorie aus dieser Liste: Arbeitsmittel, Fachliteratur / Bücher, Fortbildung / Kurs, Software / Abos, Fahrtkosten, Bürobedarf, Telefon / Internet, Werbung / Marketing, Nachhilfe, Lerncoaching, Mental Training, Online-Kurs, Sonstiges","desc":"Kurzbeschreibung max 50 Zeichen"}\nHinweis: Fast alle Belege sind Ausgaben (expense). Heutiges Datum falls nicht erkennbar: ' + today() }
+        ]
+      }]
+    })
+  });
+  if (!res.ok) throw new Error('API error');
+  const data = await res.json();
+  const text = data.content.find(b => b.type === 'text')?.text || '{}';
+  return JSON.parse(text.replace(/```json|```/g, '').trim());
+}
+
+function updateSrCats(selected) {
+  const type = document.getElementById('srType').value;
+  const cats = type === 'income' ? INC_CATS : EXP_CATS;
+  const sel = document.getElementById('srCat');
+  sel.innerHTML = cats.map(c => '<option' + (c === selected ? ' selected' : '') + '>' + c + '</option>').join('');
+}
+
+function fillScanResult(data) {
+  document.getElementById('scanLoading').style.display = 'none';
+  document.getElementById('scanResult').style.display = '';
+  document.getElementById('srType').value = data.type || 'expense';
+  document.getElementById('srDate').value = data.date || today();
+  document.getElementById('srAmount').value = data.amount || '';
+  document.getElementById('srDesc').value = data.desc || '';
+  updateSrCats(data.cat);
+}
+
+async function confirmScan() {
+  const type = document.getElementById('srType').value;
+  const date = document.getElementById('srDate').value;
+  const amount = parseFloat(document.getElementById('srAmount').value);
+  const cat = document.getElementById('srCat').value;
+  const desc = document.getElementById('srDesc').value.trim();
+  if (!date) { showToast('Bitte Datum angeben ⚠️'); return; }
+  if (!amount || amount <= 0) { showToast('Bitte gültigen Betrag eingeben ⚠️'); return; }
+  const ok = await saveEntry({ type, date, amount, cat, desc: desc || cat, receipt: currentScanImage });
+  if (!ok) return;
+  showToast('✓ Beleg gespeichert');
+  resetScan();
+  renderAll();
+}
+
+function resetScan() {
+  document.getElementById('scanPreview').style.display = 'none';
+  document.getElementById('scanResult').style.display = 'none';
+  document.getElementById('scanLoading').style.display = 'none';
+  currentScanImage = null;
+}
+
+// MANUAL
+async function addEntry(type) {
+  const p = type === 'income' ? 'inc' : 'exp';
+  const date = document.getElementById(p + 'Date').value;
+  const amount = parseFloat(document.getElementById(p + 'Amount').value);
+  const cat = document.getElementById(p + 'Cat').value;
+  const desc = document.getElementById(p + 'Desc').value.trim();
+  if (!date) { showToast('Bitte Datum angeben ⚠️'); return; }
+  if (!amount || amount <= 0) { showToast('Bitte gültigen Betrag eingeben ⚠️'); return; }
+  const ok = await saveEntry({ type, date, amount, cat, desc: desc || cat });
+  if (!ok) return;
+  document.getElementById(p + 'Date').value = '';
+  document.getElementById(p + 'Amount').value = '';
+  document.getElementById(p + 'Desc').value = '';
+  showToast(type === 'income' ? '✓ Einnahme gespeichert' : '✓ Ausgabe gespeichert');
+  renderAll();
+}
+
+async function deleteEntry(id) {
+  const { error } = await supabaseClient.from('euer_entries').delete().eq('id', id);
+  if (error) { showToast('Löschen fehlgeschlagen: ' + error.message); return; }
+  await loadEntries();
+  renderAll();
+  showToast('Gelöscht');
+}
+
+// FILTER
+function renderMonthFilter(entries) {
+  const bar = document.getElementById('monthFilter');
+  const present = [...new Set(entries.map(e => parseInt(e.date.split('-')[1]) - 1))].sort((a,b) => a-b);
+  bar.innerHTML = '';
+  present.forEach(m => {
+    const btn = document.createElement('button');
+    btn.className = 'month-btn' + (activeMonth === m ? ' active' : '');
+    btn.textContent = MONTHS[m];
+    btn.onclick = () => { activeMonth = activeMonth === m ? null : m; renderAll(); };
+    bar.appendChild(btn);
+  });
+}
+function clearFilter() { activeMonth = null; renderAll(); }
+
+// TABLE
+function renderTable(entries) {
+  const filtered = activeMonth !== null ? entries.filter(e => parseInt(e.date.split('-')[1]) - 1 === activeMonth) : entries;
+  const tbody = document.getElementById('entriesTable');
+  const empty = document.getElementById('emptyState');
+  if (filtered.length === 0) { tbody.innerHTML = ''; empty.style.display = ''; return; }
+  empty.style.display = 'none';
+  tbody.innerHTML = filtered.map(e => {
+    const dStr = new Date(e.date).toLocaleDateString('de-AT', { day:'2-digit', month:'2-digit', year:'numeric' });
+    const isInc = e.type === 'income';
+    const receiptCell = e.receipt
+      ? '<td><img class="receipt-thumb" src="' + e.receipt + '" onclick="openLightbox(' + e.id + ')" title="Beleg anzeigen"></td>'
+      : '<td style="color:var(--ink2);font-size:12px;">–</td>';
+    return '<tr><td style="white-space:nowrap;color:var(--ink2)">' + dStr + '</td><td><span class="badge ' + (isInc ? 'badge-green' : 'badge-red') + '">' + (isInc ? 'Einnahme' : 'Ausgabe') + '</span></td><td style="color:var(--ink2)">' + e.cat + '</td><td>' + e.desc + '</td><td class="' + (isInc ? 'amount-green' : 'amount-red') + '">' + (isInc ? '+' : '−') + ' ' + formatEur(e.amount) + '</td>' + receiptCell + '<td><button class="del-btn" onclick="deleteEntry(' + e.id + ')" title="Löschen">✕</button></td></tr>';
+  }).join('');
+}
+
+// LIGHTBOX
+function openLightbox(id) {
+  const entry = entries.find(e => e.id == id);
+  if (!entry?.receipt) return;
+  document.getElementById('lightboxImg').src = entry.receipt;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+
+// DASHBOARD
+function renderDashboard(entries) {
+  const inc = entries.filter(e => e.type === 'income');
+  const exp = entries.filter(e => e.type === 'expense');
+  const totalInc = inc.reduce((s, e) => s + e.amount, 0);
+  const totalExp = exp.reduce((s, e) => s + e.amount, 0);
+  const profit = totalInc - totalExp;
+  document.getElementById('totalIncome').textContent = '€ ' + formatEur(totalInc);
+  document.getElementById('totalExpense').textContent = '€ ' + formatEur(totalExp);
+  document.getElementById('totalProfit').textContent = '€ ' + formatEur(profit);
+  document.getElementById('incomeCount').textContent = inc.length + ' Buchung' + (inc.length !== 1 ? 'en' : '');
+  document.getElementById('expenseCount').textContent = exp.length + ' Buchung' + (exp.length !== 1 ? 'en' : '');
+  document.getElementById('profitNote').textContent = profit >= 0 ? 'EÜR Ergebnis ✓' : 'EÜR – Verlust';
+  document.getElementById('totalProfit').style.color = profit >= 0 ? 'var(--accent)' : 'var(--red)';
+
+  const byMonth = {};
+  entries.forEach(e => {
+    const m = parseInt(e.date.split('-')[1]) - 1;
+    if (!byMonth[m]) byMonth[m] = { inc: 0, exp: 0 };
+    if (e.type === 'income') byMonth[m].inc += e.amount; else byMonth[m].exp += e.amount;
+  });
+  const keys = Object.keys(byMonth).sort((a,b) => a-b);
+  const bd = document.getElementById('monthlyBreakdown');
+  if (keys.length === 0) { bd.innerHTML = '<p style="color:var(--ink2);font-size:14px;text-align:center;padding:16px 0;">Noch keine Daten für ' + currentYear + '.</p>'; return; }
+  bd.innerHTML = keys.map(m => {
+    const d = byMonth[m];
+    const p = d.inc - d.exp;
+    const pct = totalInc > 0 ? Math.round(d.inc / totalInc * 100) : 0;
+    return '<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);">' +
+      '<div style="width:34px;font-size:12px;font-weight:600;color:var(--ink2)">' + MONTHS[m] + '</div>' +
+      '<div style="flex:1;background:var(--bg);border-radius:4px;height:8px;overflow:hidden;"><div style="height:8px;background:var(--green);width:' + pct + '%;"></div></div>' +
+      '<div style="font-size:13px;color:var(--green);min-width:72px;text-align:right">+' + formatEur(d.inc) + '</div>' +
+      '<div style="font-size:13px;color:var(--red);min-width:72px;text-align:right">−' + formatEur(d.exp) + '</div>' +
+      '<div style="font-size:13px;font-weight:600;min-width:72px;text-align:right;color:' + (p>=0?'var(--accent)':'var(--red)') + '">' + formatEur(p) + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+// EXPORT
+function exportCSV(mode) {
+  const exportEntries = visibleEntries();
+  const rows = [['Datum','Typ','Kategorie','Beschreibung','Betrag (EUR)']];
+  exportEntries.forEach(e => rows.push([e.date, e.type === 'income' ? 'Einnahme' : 'Ausgabe', e.cat, e.desc, (e.type === 'income' ? '' : '-') + e.amount.toFixed(2)]));
+  if (mode === 'steuer') {
+    const i = exportEntries.filter(e => e.type === 'income').reduce((s,e) => s+e.amount, 0);
+    const x = exportEntries.filter(e => e.type === 'expense').reduce((s,e) => s+e.amount, 0);
+    rows.push([],['GESAMT EINNAHMEN','','','',i.toFixed(2)],['GESAMT AUSGABEN','','','',(-x).toFixed(2)],['ÜBERSCHUSS (EÜR)','','','',(i-x).toFixed(2)]);
+  }
+  const csv = rows.map(r => r.map(c => '"' + String(c).replace(/"/g,'""') + '"').join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' }));
+  a.download = 'EÜR_' + currentYear + (mode === 'steuer' ? '_Steuerberater' : '') + '.csv';
+  a.click();
+  showToast('CSV exportiert ✓');
+}
+
+// IMPORT CSV
+function importCSV(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (ev) => {
+    try {
+      const text = ev.target.result;
+      const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+      // skip header row
+      const dataLines = lines.slice(1);
+      let imported = 0;
+      let skipped = 0;
+      const existingIds = new Set(entries.map(e => e.date + '_' + e.amount + '_' + e.desc));
+      const rowsToInsert = [];
+
+      dataLines.forEach(line => {
+        // parse CSV line (handles quoted fields)
+        const cols = [];
+        let cur = '', inQ = false;
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (ch === '"') { inQ = !inQ; }
+          else if (ch === ',' && !inQ) { cols.push(cur); cur = ''; }
+          else { cur += ch; }
+        }
+        cols.push(cur);
+
+        if (cols.length < 5) return;
+        const [date, typStr, cat, desc, amtStr] = cols.map(c => c.replace(/^"|"$/g, '').trim());
+
+        // skip summary rows
+        if (!date.match(/^\d{4}-\d{2}-\d{2}$/)) { skipped++; return; }
+
+        const type = typStr === 'Einnahme' ? 'income' : 'expense';
+        const amount = Math.abs(parseFloat(amtStr.replace(',', '.')));
+        if (isNaN(amount) || amount <= 0) { skipped++; return; }
+
+        // skip duplicates
+        const key = date + '_' + amount + '_' + desc;
+        if (existingIds.has(key)) { skipped++; return; }
+
+        rowsToInsert.push({ user_id: currentUser.id, type, date, amount, cat, description: desc });
+        existingIds.add(key);
+        imported++;
+      });
+
+      if (rowsToInsert.length > 0) {
+        const { error } = await supabaseClient.from('euer_entries').insert(rowsToInsert);
+        if (error) throw error;
+      }
+      await loadEntries();
+      renderAll();
+      showToast('✓ ' + imported + ' Buchungen importiert' + (skipped > 0 ? ' (' + skipped + ' übersprungen)' : ''));
+    } catch(err) {
+      showToast('Import fehlgeschlagen ⚠️ Bitte CSV prüfen');
+    }
+    e.target.value = '';
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+// TOAST
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// RENDER ALL
+function renderAll() {
+  buildYears();
+  renderYearBar();
+  const yearEntries = visibleEntries();
+  renderDashboard(yearEntries);
+  renderMonthFilter(yearEntries);
+  renderTable(yearEntries);
+}
+
+// INIT
+document.getElementById('incDate').value = today();
+document.getElementById('expDate').value = today();
+updateSrCats('Sonstiges');
+initAuth();
+</script>
+</body>
+</html>
